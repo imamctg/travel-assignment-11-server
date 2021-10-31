@@ -43,6 +43,14 @@ async function run() {
             const service = await serviceCollection.findOne(query);
             res.json(service);
         })
+        // GET SINGLE SERVICE
+        app.get('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('getting specific service', id)
+            const query = { _id: ObjectId(id) };
+            const bookings = await bookingCollection.findOne(query);
+            res.json(bookings);
+        })
 
         // POST API
         app.post('/services', async (req, res) => {
@@ -61,22 +69,45 @@ async function run() {
             res.json(result);
         })
 
-        //DELETE BOOKING API
-        app.delete('/bookings/:id', async (req, res) => {
-            const id = req.params.id;
-            console.log('hello id ', id)
-            const query = { _id: ObjectId(id) };
-            const result = await bookingCollection.deleteOne(query);
-            res.json(result);
-        })
+
 
         // GET BOOKING
 
         app.get('/bookings', async (req, res) => {
             const result = await bookingCollection.find({}).toArray();
             res.send(result);
-            console.log(result);
+
         });
+
+        // UPDATE API
+        app.put('/bookings/:id', async (req, res) => {
+            console.log(req)
+            const id = req.params.id;
+            const orderStatus = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const bookings = {
+                $set: {
+                    status: orderStatus.status
+                }
+            }
+
+            const result = await bookingCollection.updateOne(filter, bookings, options)
+            res.json(result)
+            console.log('Updating User', req);
+            res.json('Updating not dating')
+
+
+        })
+
+        // DELETE API
+        app.delete('/bookings/:id', async (req, res) => {
+            const id = req.params.id;
+            console.log('checking', id);
+            const query = { _id: ObjectId(id) };
+            const result = await bookingCollection.deleteOne(query);
+            res.json(result);
+        })
 
 
 
